@@ -1,6 +1,6 @@
 {
 	"Name": "Prometheus",
-	"Version": "0.1.2.0",
+	"Version": "0.2.0.0",
 	"Author": "Michael Beutler",
 	"Actions": [
 		{

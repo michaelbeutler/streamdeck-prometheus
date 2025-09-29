@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Prometheus Settings UI Preview</title>
+    <style>
+        body { 
+            background-color: #1a1a1a; 
+            color: #CCCCCC; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .preview-container {
+            max-width: 320px;
+            margin: 0 auto;
+            background: #2d2d30;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .preview-header {
+            background: #007acc;
+            color: white;
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; margin-bottom: 30px;">🎨 Enhanced Prometheus Settings UI</h1>
+    
+    <div class="preview-container">
+        <div class="preview-header">StreamDeck Property Inspector</div>
+        <iframe src="ui/prometheus.html"></iframe>
+    </div>
+    
+    <div style="max-width: 320px; margin: 20px auto; padding: 16px; background: #333; border-radius: 8px;">
+        <h3 style="margin-top: 0; color: #4CAF50;">✨ New Features:</h3>
+        <ul style="font-size: 13px; line-height: 1.6;">
+            <li><strong>Modern Design:</strong> Gradient backgrounds, better typography, icons</li>
+            <li><strong>Visual Status:</strong> Connection status indicators and live feedback</li>
+            <li><strong>Smart Validation:</strong> Real-time input validation with visual feedback</li>
+            <li><strong>Quick Presets:</strong> One-click buttons for common queries and units</li>
+            <li><strong>Better UX:</strong> Sectioned layout, hover effects, and focus states</li>
+            <li><strong>Professional Look:</strong> Matches modern StreamDeck aesthetic</li>
+        </ul>
+    </div>
+
+    <script>
+        // Simulate StreamDeck connection for preview
+        setTimeout(() => {
+            const iframe = document.querySelector('iframe');
+            iframe.onload = () => {
+                const iframeWindow = iframe.contentWindow;
+                if (iframeWindow.connectElgatoStreamDeckSocket) {
+                    // Mock the StreamDeck connection
+                    iframeWindow.connectElgatoStreamDeckSocket(
+                        '9001', 
+                        'mock-uuid', 
+                        'registerPropertyInspector',
+                        '{}',
+                        '{"payload":{"settings":{"endpoint":"https://prometheus.example.com:9090/","query":"up{instance=\\"localhost:9090\\"}","unit":"°C","value":"42","lastUpdate":"2025-09-29T20:00:00.000Z"}}}'
+                    );
+                }
+            };
+        }, 100);
+    </script>
+</body>
+</html>

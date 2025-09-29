@@ -14,120 +14,402 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #2D2D30;
-            color: #CCCCCC;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d30 100%);
+            color: #f0f0f0;
             font-size: 13px;
+            line-height: 1.5;
         }
         
         .sdpi-wrapper {
-            padding: 10px;
+            padding: 16px;
+            max-width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #3a3a3d;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 4px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .prometheus-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #e6522c, #ff6b35);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .prometheus-icon::after {
+            content: "P";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: #a0a0a0;
+            margin: 0;
+        }
+        
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 12px;
+            padding-left: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            width: 16px;
+            height: 16px;
+            background: #007acc;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .section-icon::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 1px;
         }
         
         .sdpi-item {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            position: relative;
         }
         
         .sdpi-item-label {
             font-weight: 500;
-            margin-bottom: 5px;
-            color: #CCCCCC;
+            margin-bottom: 6px;
+            color: #e0e0e0;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .required-indicator {
+            color: #ff6b6b;
+            font-size: 10px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            margin-left: auto;
+        }
+
+        .status-indicator.connected {
+            background: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .status-indicator.error {
+            background: #f44336;
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.3);
         }
         
         .sdpi-item-value {
             width: 100%;
-            padding: 6px 8px;
-            border: 1px solid #464647;
-            border-radius: 3px;
-            background-color: #3C3C3C;
-            color: #CCCCCC;
-            font-size: 12px;
+            padding: 10px 12px;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            background: linear-gradient(145deg, #2a2a2a, #323232);
+            color: #f0f0f0;
+            font-size: 13px;
             font-family: inherit;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
         }
         
         .sdpi-item-value:focus {
             outline: none;
-            border-color: #007ACC;
-            background-color: #404040;
+            border-color: #007acc;
+            background: linear-gradient(145deg, #323232, #3a3a3a);
+            box-shadow: 
+                inset 0 1px 3px rgba(0, 0, 0, 0.3),
+                0 0 0 2px rgba(0, 122, 204, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .sdpi-item-value:hover:not(:focus):not(:read-only) {
+            border-color: #505050;
+            background: linear-gradient(145deg, #2e2e2e, #363636);
         }
         
         .sdpi-item-value:read-only {
-            background-color: #2A2A2A;
-            color: #969696;
+            background: linear-gradient(145deg, #1e1e1e, #252525);
+            color: #888;
+            border-color: #333;
+            cursor: not-allowed;
         }
         
         textarea.sdpi-item-value {
             resize: vertical;
-            min-height: 60px;
-            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            min-height: 80px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', monospace;
+            line-height: 1.4;
         }
         
         .sdpi-item-separator {
             border: none;
-            border-top: 1px solid #464647;
-            margin: 20px 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #444, transparent);
+            margin: 32px 0;
+            position: relative;
+        }
+
+        .sdpi-item-separator::after {
+            content: "Status";
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d2d30;
+            padding: 0 12px;
+            font-size: 11px;
+            color: #888;
+            font-weight: 500;
         }
         
         .help-text {
-            color: #969696;
+            color: #a0a0a0;
             font-size: 11px;
-            margin-top: 4px;
+            margin-top: 6px;
             line-height: 1.4;
+            padding-left: 4px;
         }
         
         .example {
-            color: #4A9EFF;
-            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            color: #64b5f6;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
             font-size: 10px;
-            margin-top: 2px;
+            margin-top: 4px;
+            padding: 4px 8px;
+            background: rgba(100, 181, 246, 0.1);
+            border-radius: 3px;
+            border-left: 2px solid #64b5f6;
+        }
+
+        .validation-message {
+            color: #ff6b6b;
+            font-size: 10px;
+            margin-top: 4px;
+            padding-left: 4px;
+            display: none;
+        }
+
+        .sdpi-item.invalid .validation-message {
+            display: block;
+        }
+
+        .sdpi-item.invalid .sdpi-item-value {
+            border-color: #ff6b6b;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 107, 107, 0.3);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: linear-gradient(145deg, #1a1a1a, #222);
+            border-radius: 6px;
+            border: 1px solid #333;
+            margin-bottom: 16px;
+        }
+
+        .connection-status.connected {
+            border-color: #4CAF50;
+            background: linear-gradient(145deg, #1a2e1a, #1e3a1e);
+        }
+
+        .connection-status.error {
+            border-color: #f44336;
+            background: linear-gradient(145deg, #2e1a1a, #3a1e1e);
+        }
+
+        .status-text {
+            font-size: 11px;
+            color: #ccc;
+        }
+
+        .status-text.connected {
+            color: #81C784;
+        }
+
+        .status-text.error {
+            color: #EF5350;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+
+        .quick-presets {
+            margin-top: 8px;
+        }
+
+        .preset-button {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px 4px 2px 0;
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #ccc;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-button:hover {
+            background: linear-gradient(145deg, #444, #333);
+            color: #fff;
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
     <div class="sdpi-wrapper">
         
-        <div class="sdpi-item">
-            <div class="sdpi-item-label">Prometheus Endpoint</div>
-            <input class="sdpi-item-value" type="url" id="endpoint" placeholder="https://prometheus.example.com:9090/" pattern="https?://.+" required>
-            <div class="help-text">
-                The URL of your Prometheus server including the protocol and port.
-                <div class="example">Example: https://prometheus.example.com:9090/</div>
+        <div class="header">
+            <h1 class="header-title">
+                <div class="prometheus-icon"></div>
+                Prometheus Monitor
+            </h1>
+            <p class="header-subtitle">Configure your metrics dashboard</p>
+        </div>
+
+        <div class="connection-status" id="connectionStatus">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span class="status-text" id="statusText">Checking connection...</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <div class="section-icon"></div>
+                Connection Settings
+            </div>
+            
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">
+                    Prometheus Endpoint
+                    <span class="required-indicator">*</span>
+                </div>
+                <input class="sdpi-item-value" type="url" id="endpoint" 
+                       placeholder="https://prometheus.example.com:9090/" 
+                       pattern="https?://.+" required>
+                <div class="validation-message">Please enter a valid HTTP/HTTPS URL</div>
+                <div class="help-text">
+                    The URL of your Prometheus server including the protocol and port.
+                    <div class="example">https://prometheus.example.com:9090/</div>
+                </div>
+            </div>
+
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">
+                    Prometheus Query (PromQL)
+                    <span class="required-indicator">*</span>
+                </div>
+                <textarea class="sdpi-item-value" id="query" 
+                          placeholder="# Enter your PromQL query here&#10;up{instance=&quot;localhost:9090&quot;}" 
+                          rows="4" required></textarea>
+                <div class="validation-message">Please enter a valid PromQL query</div>
+                <div class="help-text">
+                    Enter a valid PromQL query that returns a single numeric value.
+                    <div class="example">node_memory_MemAvailable_bytes / 1024 / 1024 / 1024</div>
+                    <div class="quick-presets">
+                        <span class="preset-button" onclick="setPresetQuery('memory')">Memory Usage</span>
+                        <span class="preset-button" onclick="setPresetQuery('cpu')">CPU Usage</span>
+                        <span class="preset-button" onclick="setPresetQuery('disk')">Disk Space</span>
+                        <span class="preset-button" onclick="setPresetQuery('uptime')">Service Up</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="sdpi-item">
-            <div class="sdpi-item-label">Prometheus Query (PromQL)</div>
-            <textarea class="sdpi-item-value" id="query" placeholder="up{instance=&quot;localhost:9090&quot;}" rows="3" required></textarea>
-            <div class="help-text">
-                Enter a valid PromQL query that returns a single numeric value.
-                <div class="example">Example: node_memory_MemAvailable_bytes / 1024 / 1024 / 1024</div>
+        <div class="section">
+            <div class="section-title">
+                <div class="section-icon"></div>
+                Display Settings
             </div>
-        </div>
-
-        <div class="sdpi-item">
-            <div class="sdpi-item-label">Unit/Suffix</div>
-            <input class="sdpi-item-value" type="text" id="unit" placeholder="MB">
-            <div class="help-text">
-                Optional unit or suffix to display after the metric value.
-                <div class="example">Examples: MB, GB, °C, %, req/s</div>
+            
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Unit/Suffix</div>
+                <input class="sdpi-item-value" type="text" id="unit" placeholder="MB">
+                <div class="help-text">
+                    Optional unit or suffix to display after the metric value.
+                    <div class="example">Examples: MB, GB, °C, %, req/s, ms</div>
+                    <div class="quick-presets">
+                        <span class="preset-button" onclick="setUnit('MB')">MB</span>
+                        <span class="preset-button" onclick="setUnit('GB')">GB</span>
+                        <span class="preset-button" onclick="setUnit('%')">%</span>
+                        <span class="preset-button" onclick="setUnit('°C')">°C</span>
+                        <span class="preset-button" onclick="setUnit('req/s')">req/s</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <hr class="sdpi-item-separator" />
 
-        <div class="sdpi-item">
-            <div class="sdpi-item-label">Current Value</div>
-            <input class="sdpi-item-value" type="text" id="value" readonly>
-            <div class="help-text">
-                Last retrieved value from Prometheus (read-only).
+        <div class="section">
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">
+                    Current Value
+                    <div class="status-indicator" id="valueStatus"></div>
+                </div>
+                <input class="sdpi-item-value" type="text" id="value" readonly>
+                <div class="help-text">
+                    Last retrieved value from Prometheus (read-only).
+                </div>
             </div>
-        </div>
 
-        <div class="sdpi-item">
-            <div class="sdpi-item-label">Last Updated</div>
-            <input class="sdpi-item-value" type="text" id="lastUpdate" readonly>
-            <div class="help-text">
-                Timestamp of the last successful update (read-only).
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Last Updated</div>
+                <input class="sdpi-item-value" type="text" id="lastUpdate" readonly>
+                <div class="help-text">
+                    Timestamp of the last successful update (read-only).
+                </div>
             </div>
         </div>
 
@@ -138,6 +420,14 @@
         let uuid = null;
         let actionInfo = {};
         let settings = {};
+
+        // Preset queries for common metrics
+        const queryPresets = {
+            memory: '(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100',
+            cpu: '100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)',
+            disk: '(1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100',
+            uptime: 'up{instance="localhost:9090"}'
+        };
 
         function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
             uuid = inUUID;
@@ -153,6 +443,7 @@
 
                 websocket.send(JSON.stringify(registerPlugin));
                 requestSettings();
+                updateConnectionStatus('connected');
             };
 
             websocket.onmessage = function(evt) {
@@ -168,6 +459,11 @@
 
             websocket.onerror = function(error) {
                 console.log('WebSocket error:', error);
+                updateConnectionStatus('error');
+            };
+
+            websocket.onclose = function() {
+                updateConnectionStatus('error');
             };
         }
 
@@ -191,6 +487,7 @@
                 websocket.send(JSON.stringify(setSettingsMessage));
             }
             settings = newSettings;
+            updateConnectionStatus('connected'); // Indicate activity
         }
 
         function updateUI() {
@@ -203,31 +500,120 @@
             if (settings.lastUpdate) {
                 const date = new Date(settings.lastUpdate);
                 document.getElementById('lastUpdate').value = date.toLocaleString();
+                updateValueStatus('connected');
             } else {
-                document.getElementById('lastUpdate').value = '';
+                document.getElementById('lastUpdate').value = 'Never';
+                updateValueStatus('error');
+            }
+
+            // Validate inputs
+            validateInputs();
+        }
+
+        function validateInputs() {
+            const endpoint = document.getElementById('endpoint');
+            const query = document.getElementById('query');
+            
+            // Validate endpoint
+            const endpointItem = endpoint.closest('.sdpi-item');
+            if (endpoint.value && !endpoint.checkValidity()) {
+                endpointItem.classList.add('invalid');
+            } else {
+                endpointItem.classList.remove('invalid');
+            }
+
+            // Validate query
+            const queryItem = query.closest('.sdpi-item');
+            if (query.value.trim() === '') {
+                queryItem.classList.add('invalid');
+            } else {
+                queryItem.classList.remove('invalid');
             }
         }
 
+        function updateConnectionStatus(status) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const connectionStatus = document.getElementById('connectionStatus');
+
+            connectionStatus.className = 'connection-status ' + status;
+            statusIndicator.className = 'status-indicator ' + status;
+            
+            switch (status) {
+                case 'connected':
+                    statusText.textContent = 'Connected to StreamDeck';
+                    statusText.className = 'status-text connected';
+                    break;
+                case 'error':
+                    statusText.textContent = 'Connection Error';
+                    statusText.className = 'status-text error';
+                    break;
+                default:
+                    statusText.textContent = 'Checking connection...';
+                    statusText.className = 'status-text';
+            }
+        }
+
+        function updateValueStatus(status) {
+            const valueStatus = document.getElementById('valueStatus');
+            valueStatus.className = 'status-indicator ' + status;
+        }
+
+        function setPresetQuery(type) {
+            if (queryPresets[type]) {
+                document.getElementById('query').value = queryPresets[type];
+                settings.query = queryPresets[type];
+                setSettings(settings);
+                
+                // Auto-set units for common presets
+                if (type === 'memory' || type === 'cpu' || type === 'disk') {
+                    setUnit('%');
+                }
+            }
+        }
+
+        function setUnit(unit) {
+            document.getElementById('unit').value = unit;
+            settings.unit = unit;
+            setSettings(settings);
+        }
+
         function setupEventListeners() {
-            document.getElementById('endpoint').addEventListener('change', function() {
-                settings.endpoint = this.value;
-                setSettings(settings);
+            const inputs = ['endpoint', 'query', 'unit'];
+            
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                
+                element.addEventListener('input', function() {
+                    validateInputs();
+                });
+                
+                element.addEventListener('change', function() {
+                    settings[id] = this.value;
+                    setSettings(settings);
+                });
+
+                element.addEventListener('blur', function() {
+                    validateInputs();
+                });
             });
 
-            document.getElementById('query').addEventListener('change', function() {
-                settings.query = this.value;
-                setSettings(settings);
-            });
-
-            document.getElementById('unit').addEventListener('change', function() {
-                settings.unit = this.value;
-                setSettings(settings);
+            // Add loading animation on input focus
+            document.querySelectorAll('.sdpi-item-value').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.classList.add('loading');
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.classList.remove('loading');
+                });
             });
         }
 
         // Initialize when page loads
         window.addEventListener('load', function() {
             setupEventListeners();
+            updateConnectionStatus('');
         });
     </script>
 </body>
