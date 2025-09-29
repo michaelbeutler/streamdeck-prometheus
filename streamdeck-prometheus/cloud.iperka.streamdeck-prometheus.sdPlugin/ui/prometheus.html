@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <title>Prometheus Settings</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #2D2D30;
+            color: #CCCCCC;
+            font-size: 13px;
+        }
+        
+        .sdpi-wrapper {
+            padding: 10px;
+        }
+        
+        .sdpi-item {
+            margin-bottom: 15px;
+        }
+        
+        .sdpi-item-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #CCCCCC;
+        }
+        
+        .sdpi-item-value {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #464647;
+            border-radius: 3px;
+            background-color: #3C3C3C;
+            color: #CCCCCC;
+            font-size: 12px;
+            font-family: inherit;
+        }
+        
+        .sdpi-item-value:focus {
+            outline: none;
+            border-color: #007ACC;
+            background-color: #404040;
+        }
+        
+        .sdpi-item-value:read-only {
+            background-color: #2A2A2A;
+            color: #969696;
+        }
+        
+        textarea.sdpi-item-value {
+            resize: vertical;
+            min-height: 60px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        }
+        
+        .sdpi-item-separator {
+            border: none;
+            border-top: 1px solid #464647;
+            margin: 20px 0;
+        }
+        
+        .help-text {
+            color: #969696;
+            font-size: 11px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        
+        .example {
+            color: #4A9EFF;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sdpi-wrapper">
+        
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Prometheus Endpoint</div>
+            <input class="sdpi-item-value" type="url" id="endpoint" placeholder="https://prometheus.example.com:9090/" pattern="https?://.+" required>
+            <div class="help-text">
+                The URL of your Prometheus server including the protocol and port.
+                <div class="example">Example: https://prometheus.example.com:9090/</div>
+            </div>
+        </div>
+
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Prometheus Query (PromQL)</div>
+            <textarea class="sdpi-item-value" id="query" placeholder="up{instance=&quot;localhost:9090&quot;}" rows="3" required></textarea>
+            <div class="help-text">
+                Enter a valid PromQL query that returns a single numeric value.
+                <div class="example">Example: node_memory_MemAvailable_bytes / 1024 / 1024 / 1024</div>
+            </div>
+        </div>
+
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Unit/Suffix</div>
+            <input class="sdpi-item-value" type="text" id="unit" placeholder="MB">
+            <div class="help-text">
+                Optional unit or suffix to display after the metric value.
+                <div class="example">Examples: MB, GB, °C, %, req/s</div>
+            </div>
+        </div>
+
+        <hr class="sdpi-item-separator" />
+
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Current Value</div>
+            <input class="sdpi-item-value" type="text" id="value" readonly>
+            <div class="help-text">
+                Last retrieved value from Prometheus (read-only).
+            </div>
+        </div>
+
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Last Updated</div>
+            <input class="sdpi-item-value" type="text" id="lastUpdate" readonly>
+            <div class="help-text">
+                Timestamp of the last successful update (read-only).
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let websocket = null;
+        let uuid = null;
+        let actionInfo = {};
+        let settings = {};
+
+        function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+            uuid = inUUID;
+            actionInfo = JSON.parse(inActionInfo);
+            
+            websocket = new WebSocket('ws://127.0.0.1:' + inPort);
+            
+            websocket.onopen = function() {
+                const registerPlugin = {
+                    event: inRegisterEvent,
+                    uuid: inUUID
+                };
+
+                websocket.send(JSON.stringify(registerPlugin));
+                requestSettings();
+            };
+
+            websocket.onmessage = function(evt) {
+                const jsonObj = JSON.parse(evt.data);
+                const event = jsonObj.event;
+                const jsonPayload = jsonObj.payload || {};
+
+                if (event === 'didReceiveSettings') {
+                    settings = jsonPayload.settings;
+                    updateUI();
+                }
+            };
+
+            websocket.onerror = function(error) {
+                console.log('WebSocket error:', error);
+            };
+        }
+
+        function requestSettings() {
+            if (websocket && websocket.readyState === 1) {
+                const getSettings = {
+                    event: 'getSettings',
+                    context: uuid
+                };
+                websocket.send(JSON.stringify(getSettings));
+            }
+        }
+
+        function setSettings(newSettings) {
+            if (websocket && websocket.readyState === 1) {
+                const setSettingsMessage = {
+                    event: 'setSettings',
+                    context: uuid,
+                    payload: newSettings
+                };
+                websocket.send(JSON.stringify(setSettingsMessage));
+            }
+            settings = newSettings;
+        }
+
+        function updateUI() {
+            document.getElementById('endpoint').value = settings.endpoint || '';
+            document.getElementById('query').value = settings.query || '';
+            document.getElementById('unit').value = settings.unit || '';
+            document.getElementById('value').value = settings.value || '';
+            
+            // Format the lastUpdate timestamp if it exists
+            if (settings.lastUpdate) {
+                const date = new Date(settings.lastUpdate);
+                document.getElementById('lastUpdate').value = date.toLocaleString();
+            } else {
+                document.getElementById('lastUpdate').value = '';
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('endpoint').addEventListener('change', function() {
+                settings.endpoint = this.value;
+                setSettings(settings);
+            });
+
+            document.getElementById('query').addEventListener('change', function() {
+                settings.query = this.value;
+                setSettings(settings);
+            });
+
+            document.getElementById('unit').addEventListener('change', function() {
+                settings.unit = this.value;
+                setSettings(settings);
+            });
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>

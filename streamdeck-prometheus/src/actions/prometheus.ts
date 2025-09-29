@@ -5,6 +5,7 @@ import streamDeck, {
   SingletonAction,
   WillAppearEvent,
   WillDisappearEvent,
+  DidReceiveSettingsEvent,
 } from "@elgato/streamdeck";
 import { PrometheusDriver } from "prometheus-query";
 import config from "../config.json";
@@ -30,16 +31,27 @@ export class PrometheusAction extends SingletonAction<PrometheusSettings> {
       // Clear any existing interval to prevent memory leaks
       this.cleanup();
 
-      // Initialize Prometheus driver with config
+      // Set default settings if not present
+      const settings = ev.payload.settings;
+      const endpoint = settings.endpoint || config.prometheus.endpoint;
+      const query = settings.query || config.defaultQuery;
+      const unit = settings.unit || config.defaultUnit;
+
+      // Update settings with defaults if they were missing
+      if (!settings.endpoint || !settings.query || !settings.unit) {
+        ev.action.setSettings({
+          ...settings,
+          endpoint: endpoint,
+          query: query,
+          unit: unit,
+        });
+      }
+
+      // Initialize Prometheus driver with settings
       this.prometheusDriver = new PrometheusDriver({
-        endpoint: config.prometheus.endpoint,
+        endpoint: endpoint,
         timeout: config.prometheus.timeout,
       });
-
-      // Set default settings if not present
-      if (!ev.payload.settings.unit) {
-        ev.payload.settings.unit = config.defaultUnit;
-      }
 
       // Set initial title
       const initialValue = ev.payload.settings.value || "Loading...";
@@ -87,6 +99,35 @@ export class PrometheusAction extends SingletonAction<PrometheusSettings> {
   }
 
   /**
+   * Handle settings changes to reinitialize Prometheus driver if needed.
+   */
+  override onDidReceiveSettings(
+    ev: DidReceiveSettingsEvent<PrometheusSettings>
+  ): void | Promise<void> {
+    try {
+      const settings = ev.payload.settings;
+      const endpoint = settings.endpoint || config.prometheus.endpoint;
+      
+      streamDeck.logger.info("Settings changed, reinitializing Prometheus driver");
+      
+      // Reinitialize the Prometheus driver with new endpoint
+      this.prometheusDriver = new PrometheusDriver({
+        endpoint: endpoint,
+        timeout: config.prometheus.timeout,
+      });
+
+      // Trigger immediate refresh with new settings
+      this.reconcile(ev as any).catch((error) => {
+        streamDeck.logger.error("Error in settings change reconcile:", error);
+      });
+      
+    } catch (error) {
+      streamDeck.logger.error("Error handling settings change:", error);
+      ev.action.setTitle("Error");
+    }
+  }
+
+  /**
    * Fetch and update Prometheus metrics with proper error handling.
    */
   private async reconcile(ev: WillAppearEvent<PrometheusSettings>): Promise<void> {
@@ -105,7 +146,16 @@ export class PrometheusAction extends SingletonAction<PrometheusSettings> {
         throw new Error("Prometheus driver not initialized");
       }
 
-      const query = config.defaultQuery;
+      const query = ev.payload.settings.query || config.defaultQuery;
+      const endpoint = ev.payload.settings.endpoint || config.prometheus.endpoint;
+      
+      if (!query) {
+        throw new Error("No Prometheus query configured");
+      }
+      
+      if (!endpoint) {
+        throw new Error("No Prometheus endpoint configured");
+      }
       
       const result = await this.prometheusDriver.instantQuery(query);
 
@@ -199,4 +249,6 @@ type PrometheusSettings = {
   value: string;
   unit?: string;
   lastUpdate?: string;
+  endpoint?: string;
+  query?: string;
 };

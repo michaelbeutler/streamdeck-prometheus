@@ -1,14 +1,14 @@
 {
 	"Name": "Prometheus",
-	"Version": "0.1.0.0",
+	"Version": "0.1.2.0",
 	"Author": "Michael Beutler",
 	"Actions": [
 		{
 			"Name": "Prometheus",
 			"UUID": "cloud.iperka.streamdeck-prometheus.prometheus",
 			"Icon": "imgs/actions/counter/icon",
-			"Tooltip": "Displays a count, which increments by one on press.",
-			"PropertyInspectorPath": "ui/increment-counter.html",
+			"Tooltip": "Display Prometheus metrics with configurable endpoint and query.",
+			"PropertyInspectorPath": "ui/prometheus.html",
 			"Controllers": [
 				"Keypad"
 			],
