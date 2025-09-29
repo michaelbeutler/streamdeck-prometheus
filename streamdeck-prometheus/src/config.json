@@ -1,0 +1,10 @@
+{
+  "prometheus": {
+    "endpoint": "https://prometheus.iperka.cloud/",
+    "timeout": 10000,
+    "refreshInterval": 5000,
+    "maxRetries": 3
+  },
+  "defaultQuery": "round(node_hwmon_temp_celsius{instance=\"10.0.10.11:9100\", chip=\"platform_coretemp_0\", sensor=\"temp1\"} > 0)",
+  "defaultUnit": "°C"
+}
