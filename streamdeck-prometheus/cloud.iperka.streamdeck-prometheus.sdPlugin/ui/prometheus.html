@@ -563,7 +563,7 @@
             if (queryPresets[type]) {
                 document.getElementById('query').value = queryPresets[type];
                 settings.query = queryPresets[type];
-                setSettings(settings);
+                setSettings({...settings});
                 
                 // Auto-set units for common presets
                 if (type === 'memory' || type === 'cpu' || type === 'disk') {
@@ -575,7 +575,7 @@
         function setUnit(unit) {
             document.getElementById('unit').value = unit;
             settings.unit = unit;
-            setSettings(settings);
+            setSettings({...settings});
         }
 
         function setupEventListeners() {
@@ -590,7 +590,7 @@
                 
                 element.addEventListener('change', function() {
                     settings[id] = this.value;
-                    setSettings(settings);
+                    setSettings({...settings});
                 });
 
                 element.addEventListener('blur', function() {
