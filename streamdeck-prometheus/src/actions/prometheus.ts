@@ -1,235 +1,259 @@
 import streamDeck, {
   action,
-  JsonObject,
   KeyDownEvent,
   SingletonAction,
   WillAppearEvent,
   WillDisappearEvent,
   DidReceiveSettingsEvent,
-} from "@elgato/streamdeck";
-import { PrometheusDriver } from "prometheus-query";
-import config from "../config.json";
+} from '@elgato/streamdeck';
+import { PrometheusDriver } from 'prometheus-query';
+import config from '../config.json';
+import type { PrometheusSettings, ParsedPrometheusSettings } from '../types.js';
+import {
+  parseSettings,
+  validateSettings,
+  mergeWithDefaults,
+  formatValue,
+  getThresholdStatus,
+  getTrendIndicator,
+  executeQuery,
+  createPrometheusDriver,
+  type QueryResult,
+} from '../utils/index.js';
 
 /**
- * A StreamDeck action that displays Prometheus metrics with automatic refresh.
+ * StreamDeck action that displays Prometheus metrics with support for
+ * instant queries, range queries, and various display formats.
  */
-@action({ UUID: "cloud.iperka.streamdeck-prometheus.prometheus" })
+@action({ UUID: 'cloud.iperka.streamdeck-prometheus.prometheus' })
 export class PrometheusAction extends SingletonAction<PrometheusSettings> {
   private intervalId: NodeJS.Timeout | null = null;
   private prometheusDriver: PrometheusDriver | null = null;
   private isQuerying = false;
   private retryCount = 0;
   private maxRetries = config.prometheus.maxRetries;
+  private previousValue: number | null = null;
+  private parsedSettings: ParsedPrometheusSettings | null = null;
 
   /**
    * Initialize the action when it becomes visible.
    */
-  override onWillAppear(
-    ev: WillAppearEvent<PrometheusSettings>
-  ): void | Promise<void> {
+  override onWillAppear(ev: WillAppearEvent<PrometheusSettings>): void {
     try {
-      // Clear any existing interval to prevent memory leaks
       this.cleanup();
 
-      // Set default settings if not present
-      const settings = ev.payload.settings;
-      const endpoint = settings.endpoint || config.prometheus.endpoint;
-      const query = settings.query || config.defaultQuery;
-      const unit = settings.unit || config.defaultUnit;
+      // Parse and validate settings
+      const mergedSettings = mergeWithDefaults(ev.payload.settings);
+      this.parsedSettings = parseSettings(mergedSettings as PrometheusSettings);
 
-      // Update settings with defaults if they were missing
-      if (!settings.endpoint || !settings.query || !settings.unit) {
-        ev.action.setSettings({
-          ...settings,
-          endpoint: endpoint,
-          query: query,
-          unit: unit,
-        });
+      const validationErrors = validateSettings(this.parsedSettings);
+      if (validationErrors.length > 0) {
+        this.log('warn', `Validation warnings: ${validationErrors.join(', ')}`);
       }
 
-      // Initialize Prometheus driver with settings
-      this.prometheusDriver = new PrometheusDriver({
-        endpoint: endpoint,
-        timeout: config.prometheus.timeout,
-      });
+      // Update settings with merged defaults
+      void ev.action.setSettings(mergedSettings);
+
+      // Initialize Prometheus driver
+      if (this.parsedSettings.endpoint) {
+        this.prometheusDriver = createPrometheusDriver(
+          this.parsedSettings.endpoint,
+          this.parsedSettings.timeout,
+          this.parsedSettings.headers
+        );
+      }
 
       // Set initial title
-      const initialValue = ev.payload.settings.value || "Loading...";
-      ev.action.setTitle(initialValue);
+      void ev.action.setTitle(ev.payload.settings.value ?? 'Loading...');
 
-      // Start the refresh interval
+      // Start refresh interval
+      const refreshInterval = this.parsedSettings.refreshInterval;
       this.intervalId = setInterval(() => {
-        this.reconcile(ev).catch((error) => {
-          streamDeck.logger.error("Error in scheduled reconcile:", error);
+        this.reconcile(ev).catch((error: unknown) => {
+          this.log('error', 'Error in scheduled reconcile:', error);
         });
-      }, config.prometheus.refreshInterval);
+      }, refreshInterval);
 
       // Perform initial query
-      this.reconcile(ev).catch((error) => {
-        streamDeck.logger.error("Error in initial reconcile:", error);
+      this.reconcile(ev).catch((error: unknown) => {
+        this.log('error', 'Error in initial reconcile:', error);
       });
 
-      streamDeck.logger.info("PrometheusAction initialized successfully");
-    } catch (error) {
-      streamDeck.logger.error("Error in onWillAppear:", error);
-      ev.action.setTitle("Error");
+      this.log('info', 'PrometheusAction initialized successfully');
+    } catch (error: unknown) {
+      this.log('error', 'Error in onWillAppear:', error);
+      void ev.action.setTitle('Error');
     }
   }
 
   /**
    * Cleanup when action disappears to prevent memory leaks.
    */
-  override onWillDisappear(
-    ev: WillDisappearEvent<PrometheusSettings>
-  ): void | Promise<void> {
+  override onWillDisappear(_ev: WillDisappearEvent<PrometheusSettings>): void {
     this.cleanup();
-    streamDeck.logger.info("PrometheusAction cleaned up");
+    this.log('info', 'PrometheusAction cleaned up');
   }
 
   /**
-   * Handles the user pressing a Stream Deck key.
+   * Handle key press for manual refresh.
    */
-  override onKeyDown(ev: KeyDownEvent<PrometheusSettings>): void | Promise<void> {
-    streamDeck.logger.info("Key pressed - triggering manual refresh");
-    
-    // Trigger immediate refresh on key press
-    this.reconcile(ev as any).catch((error) => {
-      streamDeck.logger.error("Error in manual reconcile:", error);
+  override onKeyDown(ev: KeyDownEvent<PrometheusSettings>): void {
+    this.log('info', 'Key pressed - triggering manual refresh');
+    this.retryCount = 0; // Reset retry count on manual refresh
+
+    this.reconcile(ev as unknown as WillAppearEvent<PrometheusSettings>).catch((error: unknown) => {
+      this.log('error', 'Error in manual reconcile:', error);
     });
   }
 
   /**
-   * Handle settings changes to reinitialize Prometheus driver if needed.
+   * Handle settings changes.
    */
-  override onDidReceiveSettings(
-    ev: DidReceiveSettingsEvent<PrometheusSettings>
-  ): void | Promise<void> {
+  override onDidReceiveSettings(ev: DidReceiveSettingsEvent<PrometheusSettings>): void {
     try {
-      const settings = ev.payload.settings;
-      const endpoint = settings.endpoint || config.prometheus.endpoint;
-      
-      streamDeck.logger.info("Settings changed, reinitializing Prometheus driver");
-      
-      // Reinitialize the Prometheus driver with new endpoint
-      this.prometheusDriver = new PrometheusDriver({
-        endpoint: endpoint,
-        timeout: config.prometheus.timeout,
-      });
+      // Re-parse settings
+      this.parsedSettings = parseSettings(ev.payload.settings);
 
-      // Trigger immediate refresh with new settings
-      this.reconcile(ev as any).catch((error) => {
-        streamDeck.logger.error("Error in settings change reconcile:", error);
-      });
-      
-    } catch (error) {
-      streamDeck.logger.error("Error handling settings change:", error);
-      ev.action.setTitle("Error");
+      const validationErrors = validateSettings(this.parsedSettings);
+      if (validationErrors.length > 0) {
+        this.log('warn', `Validation warnings: ${validationErrors.join(', ')}`);
+      }
+
+      this.log('info', 'Settings changed, reinitializing Prometheus driver');
+
+      // Reinitialize Prometheus driver if endpoint changed
+      if (this.parsedSettings.endpoint) {
+        this.prometheusDriver = createPrometheusDriver(
+          this.parsedSettings.endpoint,
+          this.parsedSettings.timeout,
+          this.parsedSettings.headers
+        );
+      }
+
+      // Reset retry count and trigger refresh
+      this.retryCount = 0;
+      this.reconcile(ev as unknown as WillAppearEvent<PrometheusSettings>).catch(
+        (error: unknown) => {
+          this.log('error', 'Error in settings change reconcile:', error);
+        }
+      );
+    } catch (error: unknown) {
+      this.log('error', 'Error handling settings change:', error);
+      void ev.action.setTitle('Error');
     }
   }
 
   /**
-   * Fetch and update Prometheus metrics with proper error handling.
+   * Fetch and update Prometheus metrics.
    */
   private async reconcile(ev: WillAppearEvent<PrometheusSettings>): Promise<void> {
-    // Prevent concurrent queries
     if (this.isQuerying) {
-      streamDeck.logger.debug("Query already in progress, skipping");
+      this.log('debug', 'Query already in progress, skipping');
       return;
     }
 
     this.isQuerying = true;
-    
+
     try {
-      streamDeck.logger.debug("Starting Prometheus query");
+      this.log('debug', 'Starting Prometheus query');
 
       if (!this.prometheusDriver) {
-        throw new Error("Prometheus driver not initialized");
+        throw new Error('Prometheus driver not initialized');
       }
 
-      const query = ev.payload.settings.query || config.defaultQuery;
-      const endpoint = ev.payload.settings.endpoint || config.prometheus.endpoint;
-      
-      if (!query) {
-        throw new Error("No Prometheus query configured");
-      }
-      
-      if (!endpoint) {
-        throw new Error("No Prometheus endpoint configured");
-      }
-      
-      const result = await this.prometheusDriver.instantQuery(query);
-
-      if (!result || !result.result || result.result.length === 0) {
-        throw new Error("No data returned from Prometheus query");
+      if (!this.parsedSettings) {
+        throw new Error('Settings not parsed');
       }
 
-      const value = result.result[0]?.value?.value;
-      if (value === undefined || value === null) {
-        throw new Error("Invalid value in Prometheus response");
+      if (!this.parsedSettings.query) {
+        throw new Error('No Prometheus query configured');
       }
 
-      // Update settings and display
+      if (!this.parsedSettings.endpoint) {
+        throw new Error('No Prometheus endpoint configured');
+      }
+
+      // Execute query based on metric type
+      const result: QueryResult = await executeQuery(this.prometheusDriver, this.parsedSettings);
+
+      // Format the value for display
+      const formattedValue = this.formatDisplayValue(result.value, this.parsedSettings);
+
+      // Update settings with new value
       await ev.action.setSettings({
-        value: String(value),
+        value: formattedValue,
         lastUpdate: new Date().toISOString(),
+        lastError: undefined,
       });
 
-      const formattedValue = this.formatValue(ev, result);
+      // Update display
       await ev.action.setTitle(formattedValue);
+
+      // Store current value for trend calculation
+      this.previousValue = result.value;
 
       // Reset retry count on success
       this.retryCount = 0;
 
-      streamDeck.logger.info(
-        `Successfully updated metric: ${formattedValue}`
+      this.log('info', `Successfully updated metric: ${formattedValue}`);
+    } catch (error: unknown) {
+      this.retryCount++;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.log(
+        'error',
+        `Prometheus query failed (attempt ${this.retryCount}/${this.maxRetries}): ${errorMessage}`
       );
 
-    } catch (error) {
-      this.retryCount++;
-      streamDeck.logger.error(
-        `Prometheus query failed (attempt ${this.retryCount}/${this.maxRetries}):`, 
-        error
-      );
+      // Update error state in settings
+      await ev.action.setSettings({
+        lastError: errorMessage,
+      });
 
       // Show error state after max retries
       if (this.retryCount >= this.maxRetries) {
-        await ev.action.setTitle("Error");
-        streamDeck.logger.error("Max retries reached, showing error state");
+        await ev.action.setTitle('Error');
+        this.log('error', 'Max retries reached, showing error state');
       } else {
-        // Show retry indicator
         await ev.action.setTitle(`Retry ${this.retryCount}`);
       }
-
     } finally {
       this.isQuerying = false;
     }
   }
 
   /**
-   * Format the value for display with proper error handling.
+   * Format value for display on Stream Deck key.
    */
-  private formatValue(ev: WillAppearEvent<PrometheusSettings>, result: any): string {
+  private formatDisplayValue(value: number, settings: ParsedPrometheusSettings): string {
     try {
-      if (result?.result?.[0]?.value?.value !== undefined) {
-        const value = result.result[0].value.value;
-        const numericValue = parseFloat(value);
-        
-        if (isNaN(numericValue)) {
-          return "Invalid";
-        }
+      // Format the value according to settings
+      let formattedValue = formatValue(value, settings.formatConfig);
 
-        const unit = ev.payload.settings.unit || "";
-        return `${Math.round(numericValue)}${unit}`;
+      // Add trend indicator if enabled
+      if (settings.showTrend) {
+        const trend = getTrendIndicator(value, this.previousValue);
+        if (trend) {
+          formattedValue = `${trend}${formattedValue}`;
+        }
       }
-      return "n/a";
-    } catch (error) {
-      streamDeck.logger.error("Error formatting value:", error);
-      return "Error";
+
+      // Add threshold status indicator
+      const thresholdStatus = getThresholdStatus(value, settings.thresholdConfig);
+      if (thresholdStatus === 'critical') {
+        formattedValue = `!${formattedValue}`;
+      } else if (thresholdStatus === 'warning') {
+        formattedValue = `~${formattedValue}`;
+      }
+
+      return formattedValue;
+    } catch (error: unknown) {
+      this.log('error', 'Error formatting value:', error);
+      return 'Error';
     }
   }
 
   /**
-   * Clean up resources to prevent memory leaks.
+   * Clean up resources.
    */
   private cleanup(): void {
     if (this.intervalId) {
@@ -239,16 +263,50 @@ export class PrometheusAction extends SingletonAction<PrometheusSettings> {
     this.prometheusDriver = null;
     this.isQuerying = false;
     this.retryCount = 0;
+    this.previousValue = null;
+    this.parsedSettings = null;
+  }
+
+  /**
+   * Convert unknown error to string safely
+   */
+  private errorToString(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (typeof error === 'string') {
+      return error;
+    }
+    if (typeof error === 'number' || typeof error === 'boolean') {
+      return String(error);
+    }
+    return 'Unknown error';
+  }
+
+  /**
+   * Log helper with debug mode support.
+   */
+  private log(level: 'debug' | 'info' | 'warn' | 'error', message: string, error?: unknown): void {
+    let logMessage = message;
+    if (error !== undefined) {
+      logMessage = `${message} ${this.errorToString(error)}`;
+    }
+
+    switch (level) {
+      case 'debug':
+        if (this.parsedSettings?.debug) {
+          streamDeck.logger.debug(logMessage);
+        }
+        break;
+      case 'info':
+        streamDeck.logger.info(logMessage);
+        break;
+      case 'warn':
+        streamDeck.logger.warn(logMessage);
+        break;
+      case 'error':
+        streamDeck.logger.error(logMessage);
+        break;
+    }
   }
 }
-
-/**
- * Settings for Prometheus action.
- */
-type PrometheusSettings = {
-  value: string;
-  unit?: string;
-  lastUpdate?: string;
-  endpoint?: string;
-  query?: string;
-};

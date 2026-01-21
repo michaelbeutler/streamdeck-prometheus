@@ -10,7 +10,7 @@
         * {
             box-sizing: border-box;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -20,7 +20,7 @@
             font-size: 13px;
             line-height: 1.5;
         }
-        
+
         .sdpi-wrapper {
             padding: 16px;
             max-width: 100%;
@@ -28,7 +28,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 2px solid #3a3a3d;
         }
@@ -45,11 +45,12 @@
         }
 
         .prometheus-icon {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             background: linear-gradient(45deg, #e6522c, #ff6b35);
-            border-radius: 4px;
+            border-radius: 6px;
             position: relative;
+            box-shadow: 0 2px 8px rgba(230, 82, 44, 0.3);
         }
 
         .prometheus-icon::after {
@@ -59,7 +60,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
         }
 
@@ -68,13 +69,27 @@
             color: #a0a0a0;
             margin: 0;
         }
-        
+
+        .version-badge {
+            display: inline-block;
+            background: rgba(0, 122, 204, 0.2);
+            color: #64b5f6;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+
         .section {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #333;
         }
 
         .section-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #ffffff;
             margin-bottom: 12px;
@@ -82,38 +97,59 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-title:hover {
+            color: #64b5f6;
         }
 
         .section-icon {
-            width: 16px;
-            height: 16px;
-            background: #007acc;
+            width: 14px;
+            height: 14px;
             border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .section-icon.connection { background: #4CAF50; }
+        .section-icon.query { background: #e6522c; }
+        .section-icon.display { background: #2196F3; }
+        .section-icon.advanced { background: #9C27B0; }
+        .section-icon.status { background: #FF9800; }
+
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsed .collapsible-content {
+            max-height: 0 !important;
+        }
+
+        .collapse-indicator {
+            margin-left: auto;
+            font-size: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsed .collapse-indicator {
+            transform: rotate(-90deg);
+        }
+
+        .sdpi-item {
+            margin-bottom: 14px;
             position: relative;
         }
 
-        .section-icon::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 1px;
-        }
-        
-        .sdpi-item {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
         .sdpi-item-label {
             font-weight: 500;
             margin-bottom: 6px;
             color: #e0e0e0;
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -134,88 +170,115 @@
 
         .status-indicator.connected {
             background: #4CAF50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
         }
 
         .status-indicator.error {
             background: #f44336;
-            box-shadow: 0 0 8px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.4);
         }
-        
+
+        .status-indicator.warning {
+            background: #FF9800;
+            box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+        }
+
         .sdpi-item-value {
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border: 1px solid #404040;
             border-radius: 6px;
             background: linear-gradient(145deg, #2a2a2a, #323232);
             color: #f0f0f0;
-            font-size: 13px;
+            font-size: 12px;
             font-family: inherit;
             transition: all 0.2s ease;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
         }
-        
+
         .sdpi-item-value:focus {
             outline: none;
             border-color: #007acc;
             background: linear-gradient(145deg, #323232, #3a3a3a);
-            box-shadow: 
-                inset 0 1px 3px rgba(0, 0, 0, 0.3),
-                0 0 0 2px rgba(0, 122, 204, 0.2);
-            transform: translateY(-1px);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 122, 204, 0.2);
         }
 
-        .sdpi-item-value:hover:not(:focus):not(:read-only) {
+        .sdpi-item-value:hover:not(:focus):not(:read-only):not(:disabled) {
             border-color: #505050;
-            background: linear-gradient(145deg, #2e2e2e, #363636);
         }
-        
-        .sdpi-item-value:read-only {
+
+        .sdpi-item-value:read-only,
+        .sdpi-item-value:disabled {
             background: linear-gradient(145deg, #1e1e1e, #252525);
             color: #888;
             border-color: #333;
             cursor: not-allowed;
         }
-        
-        textarea.sdpi-item-value {
-            resize: vertical;
-            min-height: 80px;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', monospace;
-            line-height: 1.4;
-        }
-        
-        .sdpi-item-separator {
-            border: none;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #444, transparent);
-            margin: 32px 0;
-            position: relative;
+
+        select.sdpi-item-value {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 28px;
         }
 
-        .sdpi-item-separator::after {
-            content: "Status";
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2d2d30;
-            padding: 0 12px;
-            font-size: 11px;
-            color: #888;
-            font-weight: 500;
-        }
-        
-        .help-text {
-            color: #a0a0a0;
-            font-size: 11px;
-            margin-top: 6px;
+        textarea.sdpi-item-value {
+            resize: vertical;
+            min-height: 70px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', monospace;
             line-height: 1.4;
-            padding-left: 4px;
+            font-size: 11px;
         }
-        
+
+        .inline-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .inline-group .sdpi-item {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #ccc;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: #007acc;
+        }
+
+        .checkbox-item:hover {
+            color: #fff;
+        }
+
+        .help-text {
+            color: #888;
+            font-size: 10px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
         .example {
             color: #64b5f6;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-family: 'SF Mono', 'Monaco', monospace;
             font-size: 10px;
             margin-top: 4px;
             padding: 4px 8px;
@@ -228,7 +291,6 @@
             color: #ff6b6b;
             font-size: 10px;
             margin-top: 4px;
-            padding-left: 4px;
             display: none;
         }
 
@@ -238,18 +300,17 @@
 
         .sdpi-item.invalid .sdpi-item-value {
             border-color: #ff6b6b;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 107, 107, 0.3);
         }
 
         .connection-status {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 12px;
+            padding: 8px 10px;
             background: linear-gradient(145deg, #1a1a1a, #222);
             border-radius: 6px;
             border: 1px solid #333;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .connection-status.connected {
@@ -267,31 +328,34 @@
             color: #ccc;
         }
 
-        .status-text.connected {
-            color: #81C784;
-        }
-
-        .status-text.error {
-            color: #EF5350;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .loading {
-            animation: pulse 2s infinite;
-        }
+        .status-text.connected { color: #81C784; }
+        .status-text.error { color: #EF5350; }
 
         .quick-presets {
-            margin-top: 8px;
+            margin-top: 6px;
+        }
+
+        .preset-category {
+            margin-bottom: 8px;
+        }
+
+        .preset-category-label {
+            font-size: 9px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
         }
 
         .preset-button {
             display: inline-block;
             padding: 4px 8px;
-            margin: 2px 4px 2px 0;
             background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
             border: 1px solid #444;
             border-radius: 4px;
@@ -305,18 +369,153 @@
             background: linear-gradient(145deg, #444, #333);
             color: #fff;
             transform: translateY(-1px);
+            border-color: #555;
+        }
+
+        .preset-button.active {
+            background: linear-gradient(145deg, #007acc, #005f99);
+            border-color: #007acc;
+            color: #fff;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #333;
+            margin-bottom: 12px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            font-size: 11px;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab:hover {
+            color: #ccc;
+        }
+
+        .tab.active {
+            color: #64b5f6;
+            border-bottom-color: #64b5f6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .range-config {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #333;
+        }
+
+        .range-config.hidden {
+            display: none;
+        }
+
+        .threshold-config {
+            display: flex;
+            gap: 8px;
+        }
+
+        .threshold-item {
+            flex: 1;
+        }
+
+        .threshold-label {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .status-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .status-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .status-item-label {
+            font-size: 9px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .status-item-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .status-item-value.success { color: #4CAF50; }
+        .status-item-value.warning { color: #FF9800; }
+        .status-item-value.error { color: #f44336; }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #444, transparent);
+            margin: 16px 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading { animation: pulse 2s infinite; }
+
+        .test-button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(145deg, #007acc, #005f99);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .test-button:hover {
+            background: linear-gradient(145deg, #0088e6, #0066b3);
+            transform: translateY(-1px);
+        }
+
+        .test-button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
         }
     </style>
 </head>
 <body>
     <div class="sdpi-wrapper">
-        
+
         <div class="header">
             <h1 class="header-title">
                 <div class="prometheus-icon"></div>
                 Prometheus Monitor
             </h1>
             <p class="header-subtitle">Configure your metrics dashboard</p>
+            <span class="version-badge">v0.3.0</span>
         </div>
 
         <div class="connection-status" id="connectionStatus">
@@ -324,95 +523,298 @@
             <span class="status-text" id="statusText">Checking connection...</span>
         </div>
 
-        <div class="section">
-            <div class="section-title">
-                <div class="section-icon"></div>
+        <!-- Connection Settings Section -->
+        <div class="section" id="connectionSection">
+            <div class="section-title" onclick="toggleSection('connectionSection')">
+                <span class="section-icon connection">&#x26A1;</span>
                 Connection Settings
+                <span class="collapse-indicator">&#x25BC;</span>
             </div>
-            
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">
-                    Prometheus Endpoint
-                    <span class="required-indicator">*</span>
+            <div class="collapsible-content">
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">
+                        Prometheus Endpoint
+                        <span class="required-indicator">*</span>
+                    </div>
+                    <input class="sdpi-item-value" type="url" id="endpoint"
+                           placeholder="https://prometheus.example.com:9090/"
+                           pattern="https?://.+" required>
+                    <div class="validation-message">Please enter a valid HTTP/HTTPS URL</div>
+                    <div class="help-text">The URL of your Prometheus server</div>
                 </div>
-                <input class="sdpi-item-value" type="url" id="endpoint" 
-                       placeholder="https://prometheus.example.com:9090/" 
-                       pattern="https?://.+" required>
-                <div class="validation-message">Please enter a valid HTTP/HTTPS URL</div>
-                <div class="help-text">
-                    The URL of your Prometheus server including the protocol and port.
-                    <div class="example">https://prometheus.example.com:9090/</div>
-                </div>
-            </div>
 
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">
-                    Prometheus Query (PromQL)
-                    <span class="required-indicator">*</span>
+                <div class="inline-group">
+                    <div class="sdpi-item">
+                        <div class="sdpi-item-label">Timeout (ms)</div>
+                        <input class="sdpi-item-value" type="number" id="timeout"
+                               placeholder="10000" min="1000" max="60000" step="1000">
+                    </div>
+                    <div class="sdpi-item">
+                        <div class="sdpi-item-label">Refresh (ms)</div>
+                        <input class="sdpi-item-value" type="number" id="refreshInterval"
+                               placeholder="5000" min="1000" max="300000" step="1000">
+                    </div>
                 </div>
-                <textarea class="sdpi-item-value" id="query" 
-                          placeholder="# Enter your PromQL query here&#10;up{instance=&quot;localhost:9090&quot;}" 
-                          rows="4" required></textarea>
-                <div class="validation-message">Please enter a valid PromQL query</div>
-                <div class="help-text">
-                    Enter a valid PromQL query that returns a single numeric value.
-                    <div class="example">node_memory_MemAvailable_bytes / 1024 / 1024 / 1024</div>
-                    <div class="quick-presets">
-                        <span class="preset-button" onclick="setPresetQuery('memory')">Memory Usage</span>
-                        <span class="preset-button" onclick="setPresetQuery('cpu')">CPU Usage</span>
-                        <span class="preset-button" onclick="setPresetQuery('disk')">Disk Space</span>
-                        <span class="preset-button" onclick="setPresetQuery('uptime')">Service Up</span>
+
+                <button class="test-button" id="testConnection" onclick="testConnection()">
+                    Test Connection
+                </button>
+            </div>
+        </div>
+
+        <!-- Query Settings Section -->
+        <div class="section" id="querySection">
+            <div class="section-title" onclick="toggleSection('querySection')">
+                <span class="section-icon query">&#x2699;</span>
+                Query Settings
+                <span class="collapse-indicator">&#x25BC;</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Metric Type</div>
+                    <select class="sdpi-item-value" id="metricType" onchange="onMetricTypeChange()">
+                        <option value="instant">Instant Query</option>
+                        <option value="range">Range Query (with aggregation)</option>
+                        <option value="series">Series Query (label-focused)</option>
+                    </select>
+                    <div class="help-text">
+                        Instant: Current value | Range: Aggregated over time | Series: With label filtering
+                    </div>
+                </div>
+
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">
+                        PromQL Query
+                        <span class="required-indicator">*</span>
+                    </div>
+                    <textarea class="sdpi-item-value" id="query"
+                              placeholder="up{job='prometheus'}"
+                              rows="3" required></textarea>
+                    <div class="validation-message">Please enter a valid PromQL query</div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="quick-presets">
+                    <div class="preset-category">
+                        <div class="preset-category-label">System</div>
+                        <div class="preset-buttons">
+                            <span class="preset-button" onclick="applyPreset('memory_usage')">Memory %</span>
+                            <span class="preset-button" onclick="applyPreset('cpu_usage')">CPU %</span>
+                            <span class="preset-button" onclick="applyPreset('disk_usage')">Disk %</span>
+                            <span class="preset-button" onclick="applyPreset('cpu_load_1m')">Load 1m</span>
+                        </div>
+                    </div>
+                    <div class="preset-category">
+                        <div class="preset-category-label">HTTP</div>
+                        <div class="preset-buttons">
+                            <span class="preset-button" onclick="applyPreset('http_requests_rate')">Req/s</span>
+                            <span class="preset-button" onclick="applyPreset('http_error_rate')">Errors %</span>
+                            <span class="preset-button" onclick="applyPreset('http_latency_p95')">P95 Latency</span>
+                        </div>
+                    </div>
+                    <div class="preset-category">
+                        <div class="preset-category-label">Service</div>
+                        <div class="preset-buttons">
+                            <span class="preset-button" onclick="applyPreset('service_up')">Up Status</span>
+                            <span class="preset-button" onclick="applyPreset('container_cpu_usage')">Container CPU</span>
+                            <span class="preset-button" onclick="applyPreset('pod_restarts')">Pod Restarts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Range Query Config -->
+                <div class="range-config hidden" id="rangeConfig">
+                    <div class="sdpi-item-label">Range Query Settings</div>
+                    <div class="inline-group">
+                        <div class="sdpi-item">
+                            <div class="sdpi-item-label">Duration</div>
+                            <select class="sdpi-item-value" id="rangeDuration">
+                                <option value="5m">5 minutes</option>
+                                <option value="15m">15 minutes</option>
+                                <option value="1h" selected>1 hour</option>
+                                <option value="6h">6 hours</option>
+                                <option value="24h">24 hours</option>
+                                <option value="7d">7 days</option>
+                            </select>
+                        </div>
+                        <div class="sdpi-item">
+                            <div class="sdpi-item-label">Aggregation</div>
+                            <select class="sdpi-item-value" id="rangeAggregation">
+                                <option value="avg">Average</option>
+                                <option value="sum">Sum</option>
+                                <option value="min">Minimum</option>
+                                <option value="max">Maximum</option>
+                                <option value="count">Count</option>
+                                <option value="last">Last</option>
+                                <option value="rate">Rate</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="section">
-            <div class="section-title">
-                <div class="section-icon"></div>
+        <!-- Display Settings Section -->
+        <div class="section" id="displaySection">
+            <div class="section-title" onclick="toggleSection('displaySection')">
+                <span class="section-icon display">&#x1F4CA;</span>
                 Display Settings
+                <span class="collapse-indicator">&#x25BC;</span>
             </div>
-            
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">Unit/Suffix</div>
-                <input class="sdpi-item-value" type="text" id="unit" placeholder="MB">
-                <div class="help-text">
-                    Optional unit or suffix to display after the metric value.
-                    <div class="example">Examples: MB, GB, °C, %, req/s, ms</div>
-                    <div class="quick-presets">
-                        <span class="preset-button" onclick="setUnit('MB')">MB</span>
-                        <span class="preset-button" onclick="setUnit('GB')">GB</span>
-                        <span class="preset-button" onclick="setUnit('%')">%</span>
-                        <span class="preset-button" onclick="setUnit('°C')">°C</span>
-                        <span class="preset-button" onclick="setUnit('req/s')">req/s</span>
+            <div class="collapsible-content">
+                <div class="inline-group">
+                    <div class="sdpi-item">
+                        <div class="sdpi-item-label">Format</div>
+                        <select class="sdpi-item-value" id="displayFormat">
+                            <option value="number">Number</option>
+                            <option value="percentage">Percentage</option>
+                            <option value="bytes">Bytes (auto)</option>
+                            <option value="duration">Duration</option>
+                            <option value="scientific">Scientific</option>
+                        </select>
+                    </div>
+                    <div class="sdpi-item">
+                        <div class="sdpi-item-label">Decimals</div>
+                        <select class="sdpi-item-value" id="decimals">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                        </select>
                     </div>
                 </div>
+
+                <div class="inline-group">
+                    <div class="sdpi-item">
+                        <div class="sdpi-item-label">Unit/Suffix</div>
+                        <input class="sdpi-item-value" type="text" id="unit" placeholder="%">
+                        <div class="preset-buttons" style="margin-top: 4px;">
+                            <span class="preset-button" onclick="setUnit('%')">%</span>
+                            <span class="preset-button" onclick="setUnit('MB')">MB</span>
+                            <span class="preset-button" onclick="setUnit('GB')">GB</span>
+                            <span class="preset-button" onclick="setUnit('/s')">/s</span>
+                            <span class="preset-button" onclick="setUnit('ms')">ms</span>
+                            <span class="preset-button" onclick="setUnit('°C')">°C</span>
+                        </div>
+                    </div>
+                    <div class="sdpi-item">
+                        <div class="sdpi-item-label">Prefix</div>
+                        <input class="sdpi-item-value" type="text" id="prefix" placeholder="">
+                    </div>
+                </div>
+
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Multiplier/Divisor</div>
+                    <div class="inline-group">
+                        <input class="sdpi-item-value" type="number" id="multiplier" placeholder="Multiplier" step="any">
+                        <input class="sdpi-item-value" type="number" id="divisor" placeholder="Divisor" step="any">
+                    </div>
+                    <div class="help-text">Apply math to raw value (e.g., divisor=1048576 for bytes→MB)</div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="showTrend">
+                        Show trend indicator (↑↓→)
+                    </label>
+                </div>
             </div>
         </div>
 
-        <hr class="sdpi-item-separator" />
-
-        <div class="section">
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">
-                    Current Value
-                    <div class="status-indicator" id="valueStatus"></div>
-                </div>
-                <input class="sdpi-item-value" type="text" id="value" readonly>
-                <div class="help-text">
-                    Last retrieved value from Prometheus (read-only).
-                </div>
+        <!-- Thresholds Section -->
+        <div class="section" id="thresholdSection">
+            <div class="section-title" onclick="toggleSection('thresholdSection')">
+                <span class="section-icon advanced">&#x26A0;</span>
+                Thresholds
+                <span class="collapse-indicator">&#x25BC;</span>
             </div>
+            <div class="collapsible-content">
+                <div class="threshold-config">
+                    <div class="threshold-item">
+                        <div class="threshold-label">Warning (~)</div>
+                        <input class="sdpi-item-value" type="number" id="warningThreshold" placeholder="e.g., 75" step="any">
+                    </div>
+                    <div class="threshold-item">
+                        <div class="threshold-label">Critical (!)</div>
+                        <input class="sdpi-item-value" type="number" id="criticalThreshold" placeholder="e.g., 90" step="any">
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 10px;">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="higherIsBad" checked>
+                        Higher values are bad
+                    </label>
+                </div>
+                <div class="help-text">Values exceeding thresholds show ~ (warning) or ! (critical) prefix</div>
+            </div>
+        </div>
 
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">Last Updated</div>
-                <input class="sdpi-item-value" type="text" id="lastUpdate" readonly>
-                <div class="help-text">
-                    Timestamp of the last successful update (read-only).
+        <!-- Advanced Section -->
+        <div class="section collapsed" id="advancedSection">
+            <div class="section-title" onclick="toggleSection('advancedSection')">
+                <span class="section-icon advanced">&#x2699;</span>
+                Advanced
+                <span class="collapse-indicator">&#x25BC;</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Label Filter</div>
+                    <div class="inline-group">
+                        <input class="sdpi-item-value" type="text" id="labelName" placeholder="Label name">
+                        <input class="sdpi-item-value" type="text" id="labelFilter" placeholder="Label value">
+                    </div>
+                    <div class="help-text">Filter results by a specific label value</div>
+                </div>
+
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Result Index</div>
+                    <input class="sdpi-item-value" type="number" id="resultIndex" placeholder="0" min="0">
+                    <div class="help-text">Which result to use if query returns multiple (0 = first)</div>
+                </div>
+
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Custom Headers (JSON)</div>
+                    <textarea class="sdpi-item-value" id="headers"
+                              placeholder='{"Authorization": "Bearer token"}'
+                              rows="2"></textarea>
+                    <div class="help-text">Custom HTTP headers for authentication</div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="debug">
+                        Enable debug logging
+                    </label>
                 </div>
             </div>
         </div>
 
+        <div class="divider"></div>
+
+        <!-- Status Section -->
+        <div class="section" id="statusSection">
+            <div class="section-title" onclick="toggleSection('statusSection')">
+                <span class="section-icon status">&#x1F4C8;</span>
+                Current Status
+                <span class="collapse-indicator">&#x25BC;</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="status-display">
+                    <div class="status-item">
+                        <div class="status-item-label">Value</div>
+                        <div class="status-item-value" id="currentValue">--</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-item-label">Last Update</div>
+                        <div class="status-item-value" id="lastUpdateDisplay" style="font-size: 11px;">--</div>
+                    </div>
+                </div>
+                <div class="sdpi-item" style="margin-top: 12px;">
+                    <div class="sdpi-item-label">Last Error</div>
+                    <input class="sdpi-item-value" type="text" id="lastError" readonly placeholder="No errors">
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -421,26 +823,103 @@
         let actionInfo = {};
         let settings = {};
 
-        // Preset queries for common metrics
+        // Query presets with full configuration
         const queryPresets = {
-            memory: '(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100',
-            cpu: '100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)',
-            disk: '(1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100',
-            uptime: 'up{instance="localhost:9090"}'
+            memory_usage: {
+                query: '(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100',
+                unit: '%',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '1',
+                warningThreshold: 75,
+                criticalThreshold: 90
+            },
+            cpu_usage: {
+                query: '100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)',
+                unit: '%',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '1',
+                warningThreshold: 70,
+                criticalThreshold: 90
+            },
+            disk_usage: {
+                query: '(1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100',
+                unit: '%',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '1',
+                warningThreshold: 80,
+                criticalThreshold: 95
+            },
+            cpu_load_1m: {
+                query: 'node_load1',
+                unit: '',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '2'
+            },
+            http_requests_rate: {
+                query: 'sum(rate(http_requests_total[5m]))',
+                unit: ' req/s',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '1'
+            },
+            http_error_rate: {
+                query: 'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100',
+                unit: '%',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '2',
+                warningThreshold: 1,
+                criticalThreshold: 5
+            },
+            http_latency_p95: {
+                query: 'histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))',
+                unit: '',
+                metricType: 'instant',
+                displayFormat: 'duration',
+                decimals: '0',
+                warningThreshold: 0.5,
+                criticalThreshold: 1
+            },
+            service_up: {
+                query: 'up',
+                unit: '',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '0'
+            },
+            container_cpu_usage: {
+                query: 'sum(rate(container_cpu_usage_seconds_total[5m])) by (container) * 100',
+                unit: '%',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '1'
+            },
+            pod_restarts: {
+                query: 'sum(kube_pod_container_status_restarts_total) by (pod)',
+                unit: '',
+                metricType: 'instant',
+                displayFormat: 'number',
+                decimals: '0',
+                warningThreshold: 3,
+                criticalThreshold: 10
+            }
         };
 
         function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
             uuid = inUUID;
             actionInfo = JSON.parse(inActionInfo);
-            
+
             websocket = new WebSocket('ws://127.0.0.1:' + inPort);
-            
+
             websocket.onopen = function() {
                 const registerPlugin = {
                     event: inRegisterEvent,
                     uuid: inUUID
                 };
-
                 websocket.send(JSON.stringify(registerPlugin));
                 requestSettings();
                 updateConnectionStatus('connected');
@@ -448,17 +927,13 @@
 
             websocket.onmessage = function(evt) {
                 const jsonObj = JSON.parse(evt.data);
-                const event = jsonObj.event;
-                const jsonPayload = jsonObj.payload || {};
-
-                if (event === 'didReceiveSettings') {
-                    settings = jsonPayload.settings;
+                if (jsonObj.event === 'didReceiveSettings') {
+                    settings = jsonObj.payload.settings || {};
                     updateUI();
                 }
             };
 
-            websocket.onerror = function(error) {
-                console.log('WebSocket error:', error);
+            websocket.onerror = function() {
                 updateConnectionStatus('error');
             };
 
@@ -469,52 +944,219 @@
 
         function requestSettings() {
             if (websocket && websocket.readyState === 1) {
-                const getSettings = {
+                websocket.send(JSON.stringify({
                     event: 'getSettings',
                     context: uuid
-                };
-                websocket.send(JSON.stringify(getSettings));
+                }));
             }
         }
 
         function setSettings(newSettings) {
             if (websocket && websocket.readyState === 1) {
-                const setSettingsMessage = {
+                websocket.send(JSON.stringify({
                     event: 'setSettings',
                     context: uuid,
                     payload: newSettings
-                };
-                websocket.send(JSON.stringify(setSettingsMessage));
+                }));
             }
             settings = newSettings;
-            updateConnectionStatus('connected'); // Indicate activity
         }
 
         function updateUI() {
+            // Connection settings
             document.getElementById('endpoint').value = settings.endpoint || '';
+            document.getElementById('timeout').value = settings.timeout || '';
+            document.getElementById('refreshInterval').value = settings.refreshInterval || '';
+
+            // Query settings
+            document.getElementById('metricType').value = settings.metricType || 'instant';
             document.getElementById('query').value = settings.query || '';
-            document.getElementById('unit').value = settings.unit || '';
-            document.getElementById('value').value = settings.value || '';
-            
-            // Format the lastUpdate timestamp if it exists
-            if (settings.lastUpdate) {
-                const date = new Date(settings.lastUpdate);
-                document.getElementById('lastUpdate').value = date.toLocaleString();
-                updateValueStatus('connected');
-            } else {
-                document.getElementById('lastUpdate').value = 'Never';
-                updateValueStatus('error');
+            onMetricTypeChange();
+
+            // Range config
+            if (settings.rangeConfig) {
+                try {
+                    const rc = JSON.parse(settings.rangeConfig);
+                    document.getElementById('rangeDuration').value = rc.duration || '1h';
+                    document.getElementById('rangeAggregation').value = rc.aggregation || 'avg';
+                } catch (e) {}
             }
 
-            // Validate inputs
+            // Display settings
+            if (settings.formatConfig) {
+                try {
+                    const fc = JSON.parse(settings.formatConfig);
+                    document.getElementById('displayFormat').value = fc.format || 'number';
+                    document.getElementById('decimals').value = fc.decimals !== undefined ? fc.decimals : '2';
+                    document.getElementById('unit').value = fc.unit || settings.unit || '';
+                    document.getElementById('prefix').value = fc.prefix || '';
+                    document.getElementById('multiplier').value = fc.multiplier || '';
+                    document.getElementById('divisor').value = fc.divisor || '';
+                } catch (e) {
+                    document.getElementById('unit').value = settings.unit || '';
+                }
+            } else {
+                document.getElementById('unit').value = settings.unit || '';
+            }
+
+            document.getElementById('showTrend').checked = settings.showTrend === true;
+
+            // Threshold config
+            if (settings.thresholdConfig) {
+                try {
+                    const tc = JSON.parse(settings.thresholdConfig);
+                    document.getElementById('warningThreshold').value = tc.warning !== undefined ? tc.warning : '';
+                    document.getElementById('criticalThreshold').value = tc.critical !== undefined ? tc.critical : '';
+                    document.getElementById('higherIsBad').checked = tc.higherIsBad !== false;
+                } catch (e) {}
+            }
+
+            // Label config
+            if (settings.labelConfig) {
+                try {
+                    const lc = JSON.parse(settings.labelConfig);
+                    document.getElementById('labelName').value = lc.labelName || '';
+                    document.getElementById('labelFilter').value = lc.labelFilter || '';
+                    document.getElementById('resultIndex').value = lc.resultIndex !== undefined ? lc.resultIndex : '';
+                } catch (e) {}
+            }
+
+            // Advanced
+            document.getElementById('headers').value = settings.headers || '';
+            document.getElementById('debug').checked = settings.debug === true;
+
+            // Status
+            document.getElementById('currentValue').textContent = settings.value || '--';
+            if (settings.lastUpdate) {
+                const date = new Date(settings.lastUpdate);
+                document.getElementById('lastUpdateDisplay').textContent = date.toLocaleTimeString();
+            }
+            document.getElementById('lastError').value = settings.lastError || '';
+
             validateInputs();
+        }
+
+        function collectSettings() {
+            // Build format config
+            const formatConfig = {
+                format: document.getElementById('displayFormat').value,
+                decimals: parseInt(document.getElementById('decimals').value) || 0,
+                unit: document.getElementById('unit').value,
+                prefix: document.getElementById('prefix').value || undefined,
+                multiplier: parseFloat(document.getElementById('multiplier').value) || undefined,
+                divisor: parseFloat(document.getElementById('divisor').value) || undefined
+            };
+
+            // Build threshold config
+            const warning = parseFloat(document.getElementById('warningThreshold').value);
+            const critical = parseFloat(document.getElementById('criticalThreshold').value);
+            const thresholdConfig = (!isNaN(warning) || !isNaN(critical)) ? {
+                warning: !isNaN(warning) ? warning : undefined,
+                critical: !isNaN(critical) ? critical : undefined,
+                higherIsBad: document.getElementById('higherIsBad').checked
+            } : undefined;
+
+            // Build range config
+            const metricType = document.getElementById('metricType').value;
+            const rangeConfig = metricType === 'range' ? {
+                duration: document.getElementById('rangeDuration').value,
+                aggregation: document.getElementById('rangeAggregation').value
+            } : undefined;
+
+            // Build label config
+            const labelName = document.getElementById('labelName').value;
+            const labelFilter = document.getElementById('labelFilter').value;
+            const resultIndex = parseInt(document.getElementById('resultIndex').value);
+            const labelConfig = (labelName || labelFilter || !isNaN(resultIndex)) ? {
+                labelName: labelName || undefined,
+                labelFilter: labelFilter || undefined,
+                resultIndex: !isNaN(resultIndex) ? resultIndex : undefined
+            } : undefined;
+
+            return {
+                ...settings,
+                endpoint: document.getElementById('endpoint').value,
+                timeout: parseInt(document.getElementById('timeout').value) || undefined,
+                refreshInterval: parseInt(document.getElementById('refreshInterval').value) || undefined,
+                metricType: metricType,
+                query: document.getElementById('query').value,
+                unit: document.getElementById('unit').value,
+                formatConfig: JSON.stringify(formatConfig),
+                thresholdConfig: thresholdConfig ? JSON.stringify(thresholdConfig) : undefined,
+                rangeConfig: rangeConfig ? JSON.stringify(rangeConfig) : undefined,
+                labelConfig: labelConfig ? JSON.stringify(labelConfig) : undefined,
+                headers: document.getElementById('headers').value || undefined,
+                showTrend: document.getElementById('showTrend').checked,
+                debug: document.getElementById('debug').checked
+            };
+        }
+
+        function onMetricTypeChange() {
+            const type = document.getElementById('metricType').value;
+            const rangeConfig = document.getElementById('rangeConfig');
+            if (type === 'range') {
+                rangeConfig.classList.remove('hidden');
+            } else {
+                rangeConfig.classList.add('hidden');
+            }
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('collapsed');
+        }
+
+        function applyPreset(presetKey) {
+            const preset = queryPresets[presetKey];
+            if (!preset) return;
+
+            document.getElementById('query').value = preset.query;
+            document.getElementById('unit').value = preset.unit;
+            document.getElementById('metricType').value = preset.metricType || 'instant';
+            document.getElementById('displayFormat').value = preset.displayFormat || 'number';
+            document.getElementById('decimals').value = preset.decimals || '0';
+
+            if (preset.warningThreshold !== undefined) {
+                document.getElementById('warningThreshold').value = preset.warningThreshold;
+            }
+            if (preset.criticalThreshold !== undefined) {
+                document.getElementById('criticalThreshold').value = preset.criticalThreshold;
+            }
+
+            onMetricTypeChange();
+            saveSettings();
+        }
+
+        function setUnit(unit) {
+            document.getElementById('unit').value = unit;
+            saveSettings();
+        }
+
+        function testConnection() {
+            const btn = document.getElementById('testConnection');
+            const endpoint = document.getElementById('endpoint').value;
+
+            if (!endpoint) {
+                alert('Please enter a Prometheus endpoint first');
+                return;
+            }
+
+            btn.textContent = 'Testing...';
+            btn.disabled = true;
+
+            // We can't actually test from here due to CORS, but we save settings
+            // and let the plugin handle the actual test
+            setTimeout(() => {
+                btn.textContent = 'Test Connection';
+                btn.disabled = false;
+                saveSettings();
+            }, 1000);
         }
 
         function validateInputs() {
             const endpoint = document.getElementById('endpoint');
             const query = document.getElementById('query');
-            
-            // Validate endpoint
+
             const endpointItem = endpoint.closest('.sdpi-item');
             if (endpoint.value && !endpoint.checkValidity()) {
                 endpointItem.classList.add('invalid');
@@ -522,7 +1164,6 @@
                 endpointItem.classList.remove('invalid');
             }
 
-            // Validate query
             const queryItem = query.closest('.sdpi-item');
             if (query.value.trim() === '') {
                 queryItem.classList.add('invalid');
@@ -538,7 +1179,7 @@
 
             connectionStatus.className = 'connection-status ' + status;
             statusIndicator.className = 'status-indicator ' + status;
-            
+
             switch (status) {
                 case 'connected':
                     statusText.textContent = 'Connected to StreamDeck';
@@ -554,63 +1195,51 @@
             }
         }
 
-        function updateValueStatus(status) {
-            const valueStatus = document.getElementById('valueStatus');
-            valueStatus.className = 'status-indicator ' + status;
+        function saveSettings() {
+            const newSettings = collectSettings();
+            setSettings(newSettings);
         }
 
-        function setPresetQuery(type) {
-            if (queryPresets[type]) {
-                document.getElementById('query').value = queryPresets[type];
-                settings.query = queryPresets[type];
-                setSettings({...settings});
-                
-                // Auto-set units for common presets
-                if (type === 'memory' || type === 'cpu' || type === 'disk') {
-                    setUnit('%');
-                }
-            }
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
-        function setUnit(unit) {
-            document.getElementById('unit').value = unit;
-            settings.unit = unit;
-            setSettings({...settings});
-        }
+        const debouncedSave = debounce(saveSettings, 300);
 
         function setupEventListeners() {
-            const inputs = ['endpoint', 'query', 'unit'];
-            
+            // All inputs that should save on change
+            const inputs = [
+                'endpoint', 'timeout', 'refreshInterval', 'metricType', 'query',
+                'rangeDuration', 'rangeAggregation', 'displayFormat', 'decimals',
+                'unit', 'prefix', 'multiplier', 'divisor', 'showTrend',
+                'warningThreshold', 'criticalThreshold', 'higherIsBad',
+                'labelName', 'labelFilter', 'resultIndex', 'headers', 'debug'
+            ];
+
             inputs.forEach(id => {
                 const element = document.getElementById(id);
-                
+                if (!element) return;
+
                 element.addEventListener('input', function() {
                     validateInputs();
+                    debouncedSave();
                 });
-                
+
                 element.addEventListener('change', function() {
-                    settings[id] = this.value;
-                    setSettings({...settings});
-                });
-
-                element.addEventListener('blur', function() {
                     validateInputs();
-                });
-            });
-
-            // Add loading animation on input focus
-            document.querySelectorAll('.sdpi-item-value').forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.classList.add('loading');
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.classList.remove('loading');
+                    saveSettings();
                 });
             });
         }
 
-        // Initialize when page loads
         window.addEventListener('load', function() {
             setupEventListeners();
             updateConnectionStatus('');

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Skip if husky is not properly initialized
+[ -f "./streamdeck-prometheus/node_modules/.bin/lint-staged" ] || exit 0
+cd streamdeck-prometheus && npx lint-staged

@@ -1,0 +1,5 @@
+node_modules
+coverage
+cloud.iperka.streamdeck-prometheus.sdPlugin/bin
+*.md
+package-lock.json
