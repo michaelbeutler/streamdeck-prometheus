@@ -1,6 +1,6 @@
-import streamDeck, { LogLevel } from "@elgato/streamdeck";
+import streamDeck, { LogLevel } from '@elgato/streamdeck';
 
-import { PrometheusAction } from "./actions/prometheus";
+import { PrometheusAction } from './actions/prometheus';
 
 // Set appropriate log level (use INFO for production, DEBUG for development)
 streamDeck.logger.setLevel(LogLevel.INFO);
@@ -18,9 +18,12 @@ process.on('unhandledRejection', (reason, promise) => {
 streamDeck.actions.registerAction(new PrometheusAction());
 
 // Connect to the Stream Deck
-streamDeck.connect().then(() => {
-  streamDeck.logger.info('StreamDeck plugin connected successfully');
-}).catch((error: unknown) => {
-  const errorMsg = error instanceof Error ? error.message : String(error);
-  streamDeck.logger.error(`Failed to connect to StreamDeck: ${errorMsg}`);
-});
+streamDeck
+  .connect()
+  .then(() => {
+    streamDeck.logger.info('StreamDeck plugin connected successfully');
+  })
+  .catch((error: unknown) => {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    streamDeck.logger.error(`Failed to connect to StreamDeck: ${errorMsg}`);
+  });

@@ -71,9 +71,7 @@ interface MockPrometheusDriver {
 /**
  * Create a mock StreamDeck action event
  */
-export function createMockActionEvent(
-  settings: Partial<PrometheusSettings> = {}
-): MockActionEvent {
+export function createMockActionEvent(settings: Partial<PrometheusSettings> = {}): MockActionEvent {
   return {
     action: {
       setTitle: jest.fn().mockResolvedValue(undefined),

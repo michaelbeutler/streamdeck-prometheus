@@ -101,11 +101,9 @@ export class PrometheusAction extends SingletonAction<PrometheusSettings> {
     this.log('info', 'Key pressed - triggering manual refresh');
     this.retryCount = 0; // Reset retry count on manual refresh
 
-    this.reconcile(ev as unknown as WillAppearEvent<PrometheusSettings>).catch(
-      (error: unknown) => {
-        this.log('error', 'Error in manual reconcile:', error);
-      }
-    );
+    this.reconcile(ev as unknown as WillAppearEvent<PrometheusSettings>).catch((error: unknown) => {
+      this.log('error', 'Error in manual reconcile:', error);
+    });
   }
 
   /**

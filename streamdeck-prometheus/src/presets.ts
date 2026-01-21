@@ -87,7 +87,8 @@ export const queryPresets: Record<string, QueryPreset> = {
   disk_usage: {
     name: 'Disk Usage',
     description: 'Root filesystem usage percentage',
-    query: '(1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100',
+    query:
+      '(1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100',
     unit: '%',
     metricType: 'instant',
     formatConfig: {
@@ -171,7 +172,8 @@ export const queryPresets: Record<string, QueryPreset> = {
   http_error_rate: {
     name: 'HTTP Error Rate',
     description: 'Percentage of HTTP 5xx errors',
-    query: 'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100',
+    query:
+      'sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100',
     unit: '%',
     metricType: 'instant',
     formatConfig: {
@@ -393,7 +395,12 @@ export function getPresetsByCategory(): Record<string, QueryPreset[]> {
   };
 
   for (const [key, preset] of Object.entries(queryPresets)) {
-    if (key.startsWith('memory_') || key.startsWith('cpu_') || key.startsWith('disk_') || key === 'temperature') {
+    if (
+      key.startsWith('memory_') ||
+      key.startsWith('cpu_') ||
+      key.startsWith('disk_') ||
+      key === 'temperature'
+    ) {
       categories.System.push(preset);
     } else if (key.startsWith('network_')) {
       categories.Network.push(preset);

@@ -24,7 +24,11 @@ jest.mock('@elgato/streamdeck', () => ({
     ERROR: 'error',
     WARN: 'warn',
   },
-  action: jest.fn().mockImplementation(() => (target: unknown): unknown => target),
+  action: jest.fn().mockImplementation(
+    () =>
+      (target: unknown): unknown =>
+        target
+  ),
   SingletonAction: class MockSingletonAction {
     onWillAppear = jest.fn();
     onWillDisappear = jest.fn();
