@@ -296,7 +296,7 @@ describe('executeQuery', () => {
         result: [{ metric: {}, values }],
       });
 
-      const aggregations: Array<{ type: AggregationType; expected: number }> = [
+      const aggregations: { type: AggregationType; expected: number }[] = [
         { type: 'avg', expected: 20 },
         { type: 'sum', expected: 60 },
         { type: 'min', expected: 10 },

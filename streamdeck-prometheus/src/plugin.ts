@@ -20,6 +20,7 @@ streamDeck.actions.registerAction(new PrometheusAction());
 // Connect to the Stream Deck
 streamDeck.connect().then(() => {
   streamDeck.logger.info('StreamDeck plugin connected successfully');
-}).catch((error) => {
-  streamDeck.logger.error('Failed to connect to StreamDeck:', error);
+}).catch((error: unknown) => {
+  const errorMsg = error instanceof Error ? error.message : String(error);
+  streamDeck.logger.error(`Failed to connect to StreamDeck: ${errorMsg}`);
 });

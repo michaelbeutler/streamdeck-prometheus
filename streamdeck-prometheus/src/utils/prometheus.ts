@@ -30,10 +30,10 @@ interface PrometheusResultItem {
     time?: Date | number | string;
     value?: string | number;
   };
-  values?: Array<{
+  values?: {
     time?: Date | number | string;
     value?: string | number;
-  }>;
+  }[];
 }
 
 /**
@@ -84,20 +84,26 @@ async function executeInstantQuery(
   labelConfig: LabelConfig
 ): Promise<QueryResult> {
   const result = await driver.instantQuery(query);
+  const resultArray = result.result as PrometheusResultItem[] | undefined;
 
-  if (!result?.result || result.result.length === 0) {
+  if (!resultArray || resultArray.length === 0) {
     throw new Error('No data returned from Prometheus');
   }
 
   const resultIndex = labelConfig.resultIndex ?? 0;
-  const filteredResults = filterByLabel(result.result as PrometheusResultItem[], labelConfig);
+  const filteredResults = filterByLabel(resultArray, labelConfig);
   const selectedResult = filteredResults[resultIndex];
 
   if (!selectedResult) {
     throw new Error(`No result found at index ${resultIndex}`);
   }
 
-  const rawValue = selectedResult.value?.value;
+  const valueObj = selectedResult.value;
+  if (!valueObj) {
+    throw new Error('Invalid value in Prometheus response');
+  }
+
+  const rawValue = valueObj.value;
   if (rawValue === undefined || rawValue === null) {
     throw new Error('Invalid value in Prometheus response');
   }
@@ -109,7 +115,7 @@ async function executeInstantQuery(
 
   return {
     value: numericValue,
-    timestamp: selectedResult.value?.time ? new Date(selectedResult.value.time) : new Date(),
+    timestamp: valueObj.time ? new Date(valueObj.time) : new Date(),
     labels: selectedResult.metric ?? {},
     raw: result,
   };
@@ -132,20 +138,26 @@ async function executeRangeQuery(
   const step = rangeConfig.step ?? `${Math.max(1, Math.floor(durationSeconds / 60))}s`;
 
   const result = await driver.rangeQuery(query, startTime, endTime, step);
+  const resultArray = result.result as PrometheusResultItem[] | undefined;
 
-  if (!result?.result || result.result.length === 0) {
+  if (!resultArray || resultArray.length === 0) {
     throw new Error('No data returned from Prometheus range query');
   }
 
   const resultIndex = labelConfig.resultIndex ?? 0;
-  const filteredResults = filterByLabel(result.result as PrometheusResultItem[], labelConfig);
+  const filteredResults = filterByLabel(resultArray, labelConfig);
   const selectedResult = filteredResults[resultIndex];
 
-  if (!selectedResult?.values || selectedResult.values.length === 0) {
+  if (!selectedResult) {
     throw new Error(`No values found for range query at index ${resultIndex}`);
   }
 
-  const values = selectedResult.values.map((v) => parseFloat(String(v.value)));
+  const valuesArray = selectedResult.values;
+  if (!valuesArray || valuesArray.length === 0) {
+    throw new Error(`No values found for range query at index ${resultIndex}`);
+  }
+
+  const values = valuesArray.map((v) => parseFloat(String(v.value)));
   const validValues = values.filter((v) => !isNaN(v));
 
   if (validValues.length === 0) {
@@ -181,13 +193,14 @@ function filterByLabel(
   results: PrometheusResultItem[],
   labelConfig: LabelConfig
 ): PrometheusResultItem[] {
-  if (!labelConfig.labelName || !labelConfig.labelFilter) {
+  const { labelName, labelFilter } = labelConfig;
+  if (!labelName || !labelFilter) {
     return results;
   }
 
   return results.filter((r) => {
-    const labelValue = r.metric?.[labelConfig.labelName!];
-    return labelValue === labelConfig.labelFilter;
+    const labelValue = r.metric?.[labelName];
+    return labelValue === labelFilter;
   });
 }
 

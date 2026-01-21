@@ -46,7 +46,7 @@ describe('queryPresets', () => {
   });
 
   it('should have all required fields in presets', () => {
-    for (const [key, preset] of Object.entries(queryPresets)) {
+    for (const preset of Object.values(queryPresets)) {
       expect(preset.name).toBeTruthy();
       expect(preset.description).toBeTruthy();
       expect(preset.query).toBeTruthy();

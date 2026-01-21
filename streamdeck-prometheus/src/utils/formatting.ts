@@ -49,7 +49,7 @@ function formatByType(value: number, format: DisplayFormat, decimals: number): s
 /**
  * Format a number with thousands separators and decimals
  */
-export function formatNumber(value: number, decimals: number = 0): string {
+export function formatNumber(value: number, decimals = 0): string {
   if (!isFinite(value)) {
     return 'N/A';
   }
@@ -71,7 +71,7 @@ export function formatNumber(value: number, decimals: number = 0): string {
 /**
  * Format a percentage value
  */
-export function formatPercentage(value: number, decimals: number = 1): string {
+export function formatPercentage(value: number, decimals = 1): string {
   if (!isFinite(value)) {
     return 'N/A';
   }
@@ -81,7 +81,7 @@ export function formatPercentage(value: number, decimals: number = 1): string {
 /**
  * Format bytes to human-readable format
  */
-export function formatBytes(bytes: number, decimals: number = 2): string {
+export function formatBytes(bytes: number, decimals = 2): string {
   if (!isFinite(bytes) || bytes === 0) {
     return '0 B';
   }
@@ -130,7 +130,7 @@ export function formatDuration(seconds: number): string {
 /**
  * Format in scientific notation
  */
-export function formatScientific(value: number, decimals: number = 2): string {
+export function formatScientific(value: number, decimals = 2): string {
   if (!isFinite(value)) {
     return 'N/A';
   }

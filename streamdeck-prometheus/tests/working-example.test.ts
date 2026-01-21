@@ -70,7 +70,7 @@ describe('Mock Functionality Tests', () => {
     jest.useFakeTimers();
     
     const callback = jest.fn();
-    const timerId = setTimeout(callback, 1000);
+    setTimeout(callback, 1000);
     
     expect(callback).not.toHaveBeenCalled();
     

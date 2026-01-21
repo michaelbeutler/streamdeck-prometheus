@@ -270,10 +270,29 @@ export class PrometheusAction extends SingletonAction<PrometheusSettings> {
   }
 
   /**
+   * Convert unknown error to string safely
+   */
+  private errorToString(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (typeof error === 'string') {
+      return error;
+    }
+    if (typeof error === 'number' || typeof error === 'boolean') {
+      return String(error);
+    }
+    return 'Unknown error';
+  }
+
+  /**
    * Log helper with debug mode support.
    */
   private log(level: 'debug' | 'info' | 'warn' | 'error', message: string, error?: unknown): void {
-    const logMessage = error ? `${message} ${String(error)}` : message;
+    let logMessage = message;
+    if (error !== undefined) {
+      logMessage = `${message} ${this.errorToString(error)}`;
+    }
 
     switch (level) {
       case 'debug':

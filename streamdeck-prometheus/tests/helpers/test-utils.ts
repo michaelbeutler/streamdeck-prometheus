@@ -4,10 +4,76 @@
 
 import type { PrometheusSettings } from '../../src/types';
 
+interface MockActionEvent {
+  action: {
+    setTitle: jest.Mock;
+    setSettings: jest.Mock;
+    setImage: jest.Mock;
+    showAlert: jest.Mock;
+    showOk: jest.Mock;
+  };
+  payload: {
+    settings: Partial<PrometheusSettings> & { endpoint: string; query: string; unit: string };
+  };
+}
+
+interface MockPrometheusResponse {
+  resultType: 'vector';
+  result: {
+    metric: Record<string, string>;
+    value: {
+      time: Date;
+      value: string;
+    };
+  }[];
+}
+
+interface MockRangeResponse {
+  resultType: 'matrix';
+  result: {
+    metric: Record<string, string>;
+    values: {
+      time: Date;
+      value: string;
+    }[];
+  }[];
+}
+
+interface MockEmptyResponse {
+  resultType: 'vector';
+  result: never[];
+}
+
+interface MockMalformedResponse {
+  resultType: 'vector';
+  result: {
+    metric: Record<string, never>;
+    value: null;
+  }[];
+}
+
+interface MockInvalidValueResponse {
+  resultType: 'vector';
+  result: {
+    metric: Record<string, never>;
+    value: {
+      time: Date;
+      value: string;
+    };
+  }[];
+}
+
+interface MockPrometheusDriver {
+  instantQuery: jest.Mock;
+  rangeQuery: jest.Mock;
+}
+
 /**
  * Create a mock StreamDeck action event
  */
-export function createMockActionEvent(settings: Partial<PrometheusSettings> = {}) {
+export function createMockActionEvent(
+  settings: Partial<PrometheusSettings> = {}
+): MockActionEvent {
   return {
     action: {
       setTitle: jest.fn().mockResolvedValue(undefined),
@@ -33,7 +99,7 @@ export function createMockActionEvent(settings: Partial<PrometheusSettings> = {}
 export function createMockPrometheusResponse(
   value: number | string = 42,
   labels: Record<string, string> = { job: 'prometheus' }
-) {
+): MockPrometheusResponse {
   return {
     resultType: 'vector' as const,
     result: [
@@ -54,7 +120,7 @@ export function createMockPrometheusResponse(
 export function createMockRangeResponse(
   values: number[] = [10, 20, 30],
   labels: Record<string, string> = { job: 'prometheus' }
-) {
+): MockRangeResponse {
   return {
     resultType: 'matrix' as const,
     result: [
@@ -73,8 +139,8 @@ export function createMockRangeResponse(
  * Create a mock Prometheus response with multiple results
  */
 export function createMockMultiResultResponse(
-  results: Array<{ value: number; labels: Record<string, string> }>
-) {
+  results: { value: number; labels: Record<string, string> }[]
+): MockPrometheusResponse {
   return {
     resultType: 'vector' as const,
     result: results.map((r) => ({
@@ -90,7 +156,7 @@ export function createMockMultiResultResponse(
 /**
  * Create an empty Prometheus response
  */
-export function createEmptyPrometheusResponse() {
+export function createEmptyPrometheusResponse(): MockEmptyResponse {
   return {
     resultType: 'vector' as const,
     result: [],
@@ -100,7 +166,7 @@ export function createEmptyPrometheusResponse() {
 /**
  * Create a malformed Prometheus response for testing error cases
  */
-export function createMalformedPrometheusResponse() {
+export function createMalformedPrometheusResponse(): MockMalformedResponse {
   return {
     resultType: 'vector' as const,
     result: [
@@ -115,7 +181,7 @@ export function createMalformedPrometheusResponse() {
 /**
  * Create a response with invalid value
  */
-export function createInvalidValueResponse() {
+export function createInvalidValueResponse(): MockInvalidValueResponse {
   return {
     resultType: 'vector' as const,
     result: [
@@ -196,7 +262,7 @@ export function createRangeQuerySettings(): PrometheusSettings {
 /**
  * Create a mock PrometheusDriver
  */
-export function createMockPrometheusDriver() {
+export function createMockPrometheusDriver(): MockPrometheusDriver {
   return {
     instantQuery: jest.fn(),
     rangeQuery: jest.fn(),
